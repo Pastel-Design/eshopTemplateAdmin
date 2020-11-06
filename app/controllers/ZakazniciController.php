@@ -38,7 +38,7 @@ class ZakazniciController extends Controller
     }
     private function renderSouhrn()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Zákaznící";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('default');

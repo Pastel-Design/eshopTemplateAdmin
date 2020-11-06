@@ -40,7 +40,7 @@ class ObjednavkyController extends Controller
 
     private function renderSouhrn()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Objednávky";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('default');
@@ -48,7 +48,7 @@ class ObjednavkyController extends Controller
 
     private function renderFaktury()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Objednávky - Faktury";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('faktury');

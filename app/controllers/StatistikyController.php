@@ -39,7 +39,7 @@ class StatistikyController extends Controller
 
     private function renderSouhrn()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Statistiky";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('default');
@@ -47,7 +47,7 @@ class StatistikyController extends Controller
 
     private function renderNavstevnost()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Statistiky - Návštěvnost";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('navstevnost');
@@ -55,7 +55,7 @@ class StatistikyController extends Controller
 
     private function renderProdej()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Statistiky - Prodej";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('prodej');
@@ -63,7 +63,7 @@ class StatistikyController extends Controller
 
     private function renderSkladovePohyby()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Statistiky - Skladové pohyby";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('skladovepohyby');
@@ -71,7 +71,7 @@ class StatistikyController extends Controller
 
     private function renderSlevy()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Statistiky - Slevy";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('slevy');

@@ -40,7 +40,7 @@ class ProduktyController extends Controller
 
     private function renderSouhrn()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Produkty";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('default');
@@ -48,7 +48,7 @@ class ProduktyController extends Controller
 
     private function renderKategorie()
     {
-        $this->head['page_title'] = "pro helenku";
+        $this->head['page_title'] = "Produkty - Kategorie";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('kategorie');
@@ -56,7 +56,7 @@ class ProduktyController extends Controller
 
     private function renderCeny()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Produkty - Ceny";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('ceny');
@@ -64,7 +64,7 @@ class ProduktyController extends Controller
 
     private function renderSklad()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Produkty - Sklad";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('sklad');
@@ -72,7 +72,7 @@ class ProduktyController extends Controller
 
     private function renderSlevy()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Produkty - Slevy";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('slevy');
@@ -80,7 +80,7 @@ class ProduktyController extends Controller
 
     private function renderImport()
     {
-        $this->head['page_title'] = "";
+        $this->head['page_title'] = "Produkty - Import";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('import');
