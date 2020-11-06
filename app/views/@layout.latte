@@ -4,13 +4,22 @@
 {include "head.latte"}
 
 <body>
-    <header>
-        {include "nav.latte"}
-    </header>
-    <article>
-        {include content}
-    </article>
+<main>
+    <aside class="nav-side">
+        {include "nav-side.latte"}
+    </aside>
+    <section>
+        <header class="nav-top">
+            {include "nav-side.latte"}
+        </header>
+        <article>
+            {include content}
+        </article>
+    </section>
+</main>
+<footer>
     {include "footer.latte"}
+</footer>
 </body>
 
 </html>
