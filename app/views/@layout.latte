@@ -4,19 +4,18 @@
 {include "head.latte"}
 
 <body>
-<main>
+<div class="wrapper">
     <aside class="nav-side">
-        {include "nav-side.latte"}
+        <div class="pastel-logo"></div>
+        {include "nav_side.latte"}
     </aside>
-    <section>
+    <section class="section-content">
         <header class="nav-top">
-            {include "nav-side.latte"}
+            {include "nav_top.latte"}
         </header>
-        <article>
-            {include content}
-        </article>
+        {include content}
     </section>
-</main>
+</div>
 <footer>
     {include "footer.latte"}
 </footer>
