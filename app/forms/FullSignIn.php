@@ -36,8 +36,8 @@ final class  FullSignIn extends FormFactory
      */
     public function create(callable $onSuccess): Form
     {
-        $this->form->addText('login', 'Uživatelské jméno nebo email:')
-            ->setHtmlAttribute("placeholder", "Uživatelské jméno nebo email *")
+        $this->form->addText('login', 'Login:')
+            ->setHtmlAttribute("placeholder", "Login *")
             ->setRequired(true);
         $this->form->addPassword('password', 'Heslo:')
             ->setHtmlAttribute("placeholder", "Heslo *")

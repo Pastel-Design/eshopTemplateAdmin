@@ -2,8 +2,10 @@
 
 namespace app\models;
 
+use app\config\AuthorityConfig;
 use app\exceptions\SignException;
-use app\classes\UserClass as User;
+use stdClass;
+
 /**
  * Manager SignManager
  *
@@ -100,5 +102,28 @@ class SignManager
     static function checkEmail($email)
     {
         return (DbManager::requestAffect("SELECT email FROM user WHERE email = ?", [$email]) === 1);
+    }
+
+    /**
+     * Check if users email is used
+     *
+     * @return void
+     * @throws SignException
+     */
+    static function checkAdmin()
+    {
+        if (session_status() != 2) {
+            throw (new SignException("Not session"));
+        }
+        if (!isset($_SESSION["user"])) {
+            throw (new SignException("Not set user in session"));
+        }
+        if (!$_SESSION["user"] instanceof stdClass) {
+            throw (new SignException("User not instance of UserObject"));
+        }
+        $requiredLevel = AuthorityConfig::$allowedLevel;
+        if ($_SESSION["user"]->role_level <= !$requiredLevel) {
+            throw (new SignException("Inssuficient level"));
+        }
     }
 }

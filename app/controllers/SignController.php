@@ -49,6 +49,7 @@ class SignController extends Controller
                 Router::reroute("error/404");
                 break;
         }
+        $this->head["css"]="sign";
     }
 
 
