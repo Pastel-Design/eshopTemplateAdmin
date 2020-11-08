@@ -41,9 +41,24 @@ class UserManager
      * @param int $limit
      * @param int $offset
      *
-     * @return void
+     * @return array
      */
-    public function selectUsers(int $limit, $offset=1){
-
+    public function selectUsers(int $limit = 50, $offset = 1)
+    {
+        $users = DbManager::requestMultiple(' 
+        SELECT user.id as "id",email,username,phone,area_code,orders,activated,registered,last_active,first_name,last_name,role.level as "level",role.name as "role_name"
+        FROM user JOIN role ON role.id = user.role_id
+        ORDER BY user.id
+        LIMIT ? OFFSET ?;
+        ', [$limit, $offset]);
+        $newUsers = array();
+        foreach ($users as $user) {
+            $invoice = DbManager::requestUnit('SELECT COUNT(id) FROM invoice_address WHERE user_id = ?', [$user["id"]]);
+            $shipping = DbManager::requestUnit('SELECT COUNT(id) FROM shipping_address WHERE user_id = ?', [$user["id"]]);
+            $user["shipping"]=$shipping;
+            $user["invoice"]=$invoice;
+            $newUsers[]=$user;
+        }
+        return $newUsers;
     }
 }

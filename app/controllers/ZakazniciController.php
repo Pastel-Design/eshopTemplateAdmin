@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\UserManager;
+
 /**
  * Controller ZakazniciController
  *
@@ -9,9 +11,11 @@ namespace app\controllers;
  */
 class ZakazniciController extends Controller
 {
+    private UserManager $userManager;
     public function __construct()
     {
         parent::__construct();
+        $this->userManager = new UserManager();
     }
 
     /**
@@ -38,7 +42,9 @@ class ZakazniciController extends Controller
     }
     private function renderSouhrn()
     {
-        $this->head['page_title'] = "Zákaznící";
+        $users = $this->userManager->selectUsers();
+        $this->data=["users"=>$users];
+        $this->head['page_title'] = "Zákazníci";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('default');

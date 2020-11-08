@@ -3,4 +3,38 @@
     <div class="container-fluid">
         <h1>Souhrn</h1>
     </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Aktivováno</th>
+            <th scope="col">Křestní</th>
+            <th scope="col">Příjmení</th>
+            <th scope="col">Registrován</th>
+            <th scope="col">Naposledy aktivní</th>
+            <th scope="col">Objednávky</th>
+            <th scope="col">Oprávnění</th>
+            <th scope="col">Fakturační adresy</th>
+            <th scope="col">Dodací adresy</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr n:foreach="$users as $user">
+            <td>{$user["id"]}</td>
+            <td>{$user["username"]}</td>
+            <td>{$user["email"]}</td>
+            <td>{if $user["activated"]}Ano{else}Ne{/if}</td>
+            <td>{$user["first_name"]}</td>
+            <td>{$user["last_name"]}</td>
+            <td>{$user["registered"]}</td>
+            <td>{$user["last_active"]}</td>
+            <td>{$user["orders"]}</td>
+            <td>{$user["level"]} {$user["role_name"]}</td>
+            <td>{$user["invoice"]}</td>
+            <td>{$user["shipping"]}</td>
+        </tr>
+        </tbody>
+    </table>
 {/block}

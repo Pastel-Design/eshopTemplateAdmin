@@ -4,6 +4,9 @@
 {include "head.latte"}
 
 <body>
+{foreach $flashes as $flash}
+    <div class="flashMessage {$flash["type"]}">{$flash["message"]}</div>
+{/foreach}
 <div class="wrapper">
     <aside class="nav-side">
         <div class="pastel-logo"></div>
@@ -16,9 +19,9 @@
         {include content}
     </section>
 </div>
-<footer>
-    {include "footer.latte"}
-</footer>
+
+{include "footer.latte"}
+
 </body>
 
 </html>
