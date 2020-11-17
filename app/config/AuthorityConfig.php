@@ -2,7 +2,7 @@
 
 namespace app\config;
 /**
- * Config DbConfig
+ * Config AuthorityConfig
  *
  * @package app\config
  */

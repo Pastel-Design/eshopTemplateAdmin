@@ -20,12 +20,9 @@ function autoloadFunction($class)
 }
 
 
-
 //registrace funkce pro její použití jako php autoload funkce
 spl_autoload_register("autoloadFunction");
 session_start();
-
-
 //vytvoření instance směrovače a jeho zpracování url a následné vypsání základního pohledu
 $router = new Router();
 $router->process(array($_SERVER['REQUEST_URI']));

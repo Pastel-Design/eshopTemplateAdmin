@@ -2,6 +2,11 @@
 
 namespace app\controllers;
 
+use app\models\CategoryManager;
+use app\models\ProductManager;
+use app\router\Router;
+use Exception;
+
 /**
  * Controller ProduktyController
  *
@@ -9,9 +14,15 @@ namespace app\controllers;
  */
 class ProduktyController extends Controller
 {
+
+    private ProductManager $productManager;
+    private CategoryManager $categoryManager;
+
     public function __construct()
     {
         parent::__construct();
+        $this->productManager = new ProductManager();
+        $this->categoryManager = new CategoryManager();
     }
 
     /**
@@ -21,6 +32,7 @@ class ProduktyController extends Controller
      * @param array|null $gets
      *
      * @return void
+     * @throws Exception
      */
     public function process(array $params, array $gets = null)
     {
@@ -28,7 +40,7 @@ class ProduktyController extends Controller
             $function = str_replace("-", "", ucfirst(strtolower($params[0])));
             array_shift($params);
             if (is_file("../app/views/Produkty/" . $function . ".latte")) {
-                call_user_func(array($this, "render" . $function), $params);
+                call_user_func(array($this, "render" . $function), $params, $gets);
             } else {
                 $this->renderSouhrn();
             }
@@ -38,16 +50,32 @@ class ProduktyController extends Controller
 
     }
 
+    /**
+     * @return void
+     * @throws Exception
+     */
     private function renderSouhrn()
     {
+        $this->data["products"]=$this->productManager->selectProducts();
         $this->head['page_title'] = "Produkty";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
         $this->setView('default');
     }
-
+    private function renderDetail($params,$gets)
+    {
+        if(!$this->productManager->productExists($gets["id"])){
+            Router::reroute("error/404");
+        }
+        $this->data["product"]=$this->productManager->selectProduct($gets["id"]);
+        $this->head['page_title'] = "Produkty";
+        $this->head['page_keywords'] = "";
+        $this->head['page_description'] = "";
+        $this->setView('detail');
+    }
     private function renderKategorie()
     {
+        $this->data["categories"] = $this->categoryManager->selectCategories();
         $this->head['page_title'] = "Produkty - Kategorie";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";

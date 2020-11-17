@@ -27,7 +27,7 @@ abstract class Controller
     /**
      * @var array $head
      */
-    protected array $head = ['page_title' => '', 'page_keywords' => '', 'page_description' => '', 'css' => '', 'js' => ''];
+    protected array $head = ['page_title' => '', 'page_keywords' => '', 'page_description' => '', 'js' => '', 'flashes' => []];
 
     /**
      * @var string $controllerName
@@ -94,15 +94,13 @@ abstract class Controller
      * @param string      $view
      * View name
      * @param string|null $js
-     * @param string|null $css
      *
      * @return void
      */
-    public function setView(string $view, ?string $js = null, ?string $css = null): void
+    public function setView(string $view, ?string $js = null): void
     {
         $this->view = $view;
         $this->head["js"] = $js;
-        $this->head["css"] = $css;
     }
 
     /**

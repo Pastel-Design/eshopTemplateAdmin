@@ -3,4 +3,48 @@
     <div class="container-fluid">
         <h1>Souhrn</h1>
     </div>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th scope="col">Název</th>
+            <th scope="col"></th>
+            <th scope="col">Cena</th>
+            <th scope="col">Sklad</th>
+            <th scope="col">Dostupnost</th>
+            <th scope="col">Akce</th>
+            <th scope="col">Viditelnost</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $products as $product}
+            <tr>
+                <td><a href="produkty/detail/?id={$product["id"]}">{$product["name"]}</a></td>
+                <td><img src="images/{$product["main_image"]}" height="50px" alt="obrázek {$product["name"]}"></td>
+                <td>{$product["price"]} Kč</td>
+                <td>{$product["amount"]} ks</td>
+                <td>{$product["dostupnost"]}</td>
+
+                {if $product["on_sale"]}
+                    <td class="table-state-changer" status="true" attribute="dostupnost">
+                        <i class="fa fa-check-circle"></i>
+                    </td>
+                {else}
+                    <td class="table-state-changer" status="false" attribute="dostupnost">
+                        <i class="fa fa-times"></i>
+                    </td>
+                {/if}
+                {if $product["visible"]}
+                    <td class="table-state-changer" status="true" attribute="visibility">
+                        <i class="fa fa-check-circle"></i>
+                    </td>
+                {else}
+                    <td class="table-state-changer" status="false" attribute="visibility">
+                        <i class="fa fa-times"></i>
+                    </td>
+                {/if}
+
+            </tr>
+        {/foreach}
+        </tbody>
+    </table>
 {/block}

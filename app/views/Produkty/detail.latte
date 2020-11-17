@@ -1,0 +1,88 @@
+{extends "../@layout.latte"}
+{block content}
+    <div class="container-fluid">
+        <h1>Detail produktu {$product["name"]}</h1>
+        <!-- Tab links -->
+        <div class="tab">
+            <button class="tab-links btn btn-info" tab-controls="product-info">Souhrn</button>
+            <button class="tab-links btn btn-info" tab-controls="product-price">Cena</button>
+            <button class="tab-links btn btn-info" tab-controls="product-storage">Sklad</button>
+            <button class="tab-links btn btn-info" tab-controls="product-parameters">Parametry</button>
+            <button class="tab-links btn btn-info" tab-controls="product-images">Obrázky</button>
+            <button class="tab-links btn btn-info" tab-controls="product-sales">Prodeje</button>
+        </div>
+
+        <div id="product-info" class="tab-content" tab-group="tabs">
+            <h3>Název</h3>
+            <input name="" type="text" value="{$product["name"]}">
+            <h3>Název v hlavičce dokumentu</h3>
+            <input name="" type="text" value="{$product["title_name"]}">
+            <h3>Url produktu</h3>
+            https://eshop.local/produkty/<input name="" type="text" value="{$product["dash_name"]}">
+            <h3>Krátký popis</h3>
+            <textarea name="" id="" cols="30" rows="10">{$product["shortdesc"]}</textarea>
+            <h3>Podrobný popis</h3>
+            <textarea name="" id="" cols="30" rows="10">{$product["longdesc"]}</textarea><br>
+            <h3>Varianty</h3>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Název</th>
+                    <th scope="col"></th>
+                    <th scope="col">Cena</th>
+                    <th scope="col">Sklad</th>
+                    <th scope="col">Dostupnost</th>
+                    <th scope="col">Akce</th>
+                    <th scope="col">Viditelnost</th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach $product["variants"] as $variant}
+                    <tr>
+                        <td><a href="produkty/detail/?id={$variant["id"]}">{$variant["name"]}</a></td>
+                        <td><img src="images/{$variant["main_image"]}" height="50px" alt="obrázek {$variant["name"]}"></td>
+                        <td>{$variant["price"]} Kč</td>
+                        <td>{$variant["amount"]} ks</td>
+                        <td>{$variant["dostupnost"]}</td>
+
+                        {if $variant["on_sale"]}
+                            <td class="table-state-changer" status="true" attribute="dostupnost">
+                                <i class="fa fa-check-circle"></i>
+                            </td>
+                        {else}
+                            <td class="table-state-changer" status="false" attribute="dostupnost">
+                                <i class="fa fa-times"></i>
+                            </td>
+                        {/if}
+                {if $variant["visible"]}
+                            <td class="table-state-changer" status="true" attribute="visibility">
+                                <i class="fa fa-check-circle"></i>
+                            </td>
+                        {else}
+                            <td class="table-state-changer" status="false" attribute="visibility">
+                                <i class="fa fa-times"></i>
+                            </td>
+                        {/if}
+
+                    </tr>
+                {/foreach}
+                </tbody>
+            </table>
+        </div>
+        <div id="product-price" class="tab-content" tab-group="tabs">
+
+        </div>
+        <div id="product-storage" class="tab-content" tab-group="tabs">
+            <h3>Sklad</h3>
+        </div>
+        <div id="product-parameters" class="tab-content" tab-group="tabs">
+            <h3>Parametry</h3>
+        </div>
+        <div id="product-images" class="tab-content" tab-group="tabs">
+            <h3>Obrázky</h3>
+        </div>
+        <div id="product-sales" class="tab-content" tab-group="tabs">
+            <h3>Prodeje</h3>
+        </div>
+    </div>
+{/block}

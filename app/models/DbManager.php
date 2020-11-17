@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\config\ProductionConfig;
 use app\router\Router;
 use PDO;
 use PDOException as PDOException;
@@ -60,7 +61,11 @@ class DbManager
             $result->execute($params);
             return $result->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $excepiton) {
-            Router::reroute("error/500");
+            if(ProductionConfig::$production){
+                //Router::reroute("error/500");
+            }else{
+                var_dump($excepiton);
+            }
         }
     }
 
@@ -82,7 +87,11 @@ class DbManager
             $result->setFetchMode(PDO::FETCH_CLASS, $class);
             return $result->fetch();
         } catch (PDOException $excepiton) {
-            Router::reroute("error/500");
+            if(ProductionConfig::$production){
+                //Router::reroute("error/500");
+            }else{
+                var_dump($excepiton);
+            }
         }
     }
 
@@ -101,7 +110,11 @@ class DbManager
             $result->execute($params);
             return $result->fetch();
         } catch (PDOException $excepiton) {
-            Router::reroute("error/500");
+            if(ProductionConfig::$production){
+                //Router::reroute("error/500");
+            }else{
+                var_dump($excepiton);
+            }
         }
     }
 
@@ -120,7 +133,11 @@ class DbManager
             $result->execute($params);
             return $result->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $excepiton) {
-            Router::reroute("error/500");
+            if(ProductionConfig::$production){
+                //Router::reroute("error/500");
+            }else{
+                var_dump($excepiton);
+            }
         }
     }
 
@@ -138,7 +155,11 @@ class DbManager
             $result = self::requestSingleWOAssoc($sql, $params);
             return ($result == null ? null : $result[0]);
         } catch (PDOException $excepiton) {
-            Router::reroute("error/500");
+            if(ProductionConfig::$production){
+                //Router::reroute("error/500");
+            }else{
+                var_dump($excepiton);
+            }
         }
     }
 
@@ -184,5 +205,24 @@ class DbManager
             self::$connection->rollback();
             return false;
         }
+    }
+
+    /**
+     * Returns if the record exists
+     *
+     * Table column to search by
+     * @param $column
+     * Table in which to search
+     * @param $table
+     * Parameter to search for
+     * @param $param
+     *
+     * @return boolean
+     */
+    public static function requestExists($column,$table,$param)
+    {
+        $sql = "SELECT COUNT(".$column.") FROM ".$table." WHERE ".$column."=?";
+        return (boolean) self::requestUnit($sql,[$param]);
+
     }
 }
