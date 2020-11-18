@@ -1,0 +1,28 @@
+{
+  "name": "eshopTemplateAdmin",
+  "version": "1.0.0",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.1",
+    "axios": "^0.21.0",
+    "bootstrap": "^4.5.3",
+    "jquery": "^3.5.1",
+    "nette-forms": "^3.1.0"
+  },
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pastel-Design/eshopTemplateAdmin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Pastel-Design/eshopTemplateAdmin/issues"
+  },
+  "homepage": "https://github.com/Pastel-Design/eshopTemplateAdmin#readme",
+  "description": ""
+}

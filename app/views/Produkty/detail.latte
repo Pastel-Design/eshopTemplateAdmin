@@ -18,7 +18,12 @@
             <h3>Název v hlavičce dokumentu</h3>
             <input name="" type="text" value="{$product["title_name"]}">
             <h3>Url produktu</h3>
-            https://eshop.local/produkty/<input name="" type="text" value="{$product["dash_name"]}">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3">eshop.local/produkty/</span>
+                </div>
+                <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" value="{$product["dash_name"]}">
+            </div>
             <h3>Krátký popis</h3>
             <textarea name="" id="" cols="30" rows="10">{$product["shortdesc"]}</textarea>
             <h3>Podrobný popis</h3>

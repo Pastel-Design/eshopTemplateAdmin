@@ -37,7 +37,7 @@ class ProduktyController extends Controller
     public function process(array $params, array $gets = null)
     {
         if (isset($params[0])) {
-            $function = str_replace("-", "", ucfirst(strtolower($params[0])));
+            $function = str_replace(" ", "", ucwords(str_replace("-", " ",strtolower($params[0]))));
             array_shift($params);
             if (is_file("../app/views/Produkty/" . $function . ".latte")) {
                 call_user_func(array($this, "render" . $function), $params, $gets);

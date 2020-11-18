@@ -61,4 +61,9 @@ class UserManager
         }
         return $newUsers;
     }
+
+    public function selectUsersEmails()
+    {
+        return DbManager::requestMultiple('SELECT id, email as name FROM user');
+    }
 }
