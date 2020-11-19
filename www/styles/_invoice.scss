@@ -1,0 +1,21 @@
+#invoice-container{
+  display: block;
+  height: 297mm;
+  width: 210mm;
+  background-color: #f9f9f9;
+  box-shadow: 6px 6px 2px rgba(0, 0, 0, 0.30);
+  margin: 20px;
+}
+
+.invoice-header{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 20px;
+  padding-right: 75px;
+}
+.address-row{
+  background-color: #e47d5c;
+  color: white;
+}

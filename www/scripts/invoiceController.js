@@ -1,7 +1,17 @@
 // noinspection JSXNamespaceValidation
-let renderPdf = function (params){
+class Invoice extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+        <h3>{this.props.name}</h3>
+        )
+    }
 
 }
+
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -12,7 +22,8 @@ class App extends React.Component {
             invoiceType: "",
             payment: "",
             shipping: "",
-            user: ""
+            user: "",
+            userInfo:[]
         };
         this.handleChange = this.handleChange.bind(this);
     }
@@ -35,14 +46,31 @@ class App extends React.Component {
                 }
             )
     }
-
+    getUserInfo(email){
+        fetch("objednavky/faktury/data/userInfo/"+email)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        userInfo: result
+                    });
+                },
+                (error) => {
+                    this.setState({
+                        error: error
+                    });
+                }
+            )
+    }
     handleChange(value, type) {
         this.setState({[type]: value});
-        renderPdf(this.state);
+        if(type === "user"){
+            this.getUserInfo(value)
+        }
     }
 
     render() {
-        let invoiceType = [{"name": "Objednávka", "id": 1}, {"name": "Dobropis", "id": 2}]
+        let invoiceType = [{"name": "Faktura", "id": 1}, {"name": "Dobropis", "id": 2}]
 
         if (this.state.isLoaded) {
             return (
@@ -52,16 +80,59 @@ class App extends React.Component {
                     <InvoiceGeneratorSelect name={"Platba"} type={"payment"} items={this.state.formData.payments} value={this.state["payment"]} onValueChange={this.handleChange}/>
                     <InvoiceGeneratorSelect name={"Doprava"} type={"shipping"} items={this.state.formData.shipping} value={this.state["shipping"]} onValueChange={this.handleChange}/>
                     <InvoiceGeneratorSelect name={"Zákazník"} type={"user"} items={this.state.formData.users} value={this.state["user"]} onValueChange={this.handleChange}/>
+                    <InvoicePage name={this.state.invoiceType} number={this.state.formData.number} eshopInfo={this.state.formData.eshopInfo} userInfo={this.state.userInfo}/>
                 </div>
             )
         } else {
             return (
-                <div>Loading...</div>
+                    <div>Loading...</div>
             )
         }
     }
 }
 
+class InvoicePage extends React.Component {
+
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        const {name,number,eshopInfo,userInfo} = this.props;
+            return (
+                <div id={"invoice-container"}>
+                    <div className={"invoice-header"}>
+                        <img src={"www/images/pastel-logo.svg"} alt={"shop-logo"} height={50}/> <h3>{name} {number}</h3>
+                    </div>
+                    <div className={"address-row"}>
+                        {console.log(eshopInfo)}
+                        {console.log(userInfo)}
+                        <div className={"eshop-info-container"}>
+                            <h4>Dodavatel:</h4>
+                            <p>{eshopInfo.firm_name}</p>
+                            <p>{eshopInfo.adress1}</p>
+                            <p>{eshopInfo.adress2}</p>
+                            <p>{eshopInfo.city} {eshopInfo.zipcode}</p>
+                            <p>{eshopInfo.country}</p>
+                            <p>{eshopInfo.DIC}</p>
+                            <p>{eshopInfo.IC}</p>
+                        </div>
+                        <div className={"eshop-info-container"}>
+                            <h4>Odběratel:</h4>
+                            <p>{userInfo.firm_name}</p>
+                            <p>{userInfo.first_name} {userInfo.last_name}</p>
+                            <p>{userInfo.email} </p><p>{userInfo.area_code}{userInfo.phone}</p>
+                            <p>{userInfo.adress1}</p>
+                            <p>{userInfo.adress2}</p>
+                            <p>{userInfo.city} {userInfo.zipcode}</p>
+                            <p>{userInfo.country}</p>
+                            <p>{userInfo.DIC}</p>
+                            <p>{userInfo.IC}</p>
+                        </div>
+                    </div>
+                </div>
+            )
+    }
+}
 class InvoiceGeneratorSelect extends React.Component {
 
     constructor(props) {
@@ -71,6 +142,10 @@ class InvoiceGeneratorSelect extends React.Component {
 
     handleChange(e) {
         this.props.onValueChange(e.target.value, this.props.type);
+    }
+
+    componentDidMount() {
+        this.props.onValueChange(this.props.items[0]["name"], this.props.type);
     }
 
     render() {

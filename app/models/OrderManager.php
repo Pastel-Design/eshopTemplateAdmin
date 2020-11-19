@@ -23,4 +23,14 @@ class OrderManager
     {
         return DbManager::requestMultiple("SELECT id,name FROM payment");
     }
+
+    public function newOrderNumber()
+    {
+        return DbManager::requestUnit("SELECT MAX(invoice_number) FROM invoice");
+    }
+
+    public function selectEshopInvoiceInfo()
+    {
+        return DbManager::requestSingle("SELECT * FROM eshop_info");
+    }
 }

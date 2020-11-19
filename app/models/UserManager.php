@@ -66,4 +66,15 @@ class UserManager
     {
         return DbManager::requestMultiple('SELECT id, email as name FROM user');
     }
+
+    public function selectUsersInvoiceInfo($email)
+    {
+        return DbManager::requestSingle("SELECT * FROM invoice_address WHERE user_id=?",[$this->getUserId($email)]);
+
+    }
+
+    private function getUserId($login)
+    {
+        return DbManager::requestUnit("SELECT id FROM user WHERE email = ? OR username = ?",[$login,$login]);
+    }
 }

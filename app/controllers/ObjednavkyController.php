@@ -86,12 +86,23 @@ class ObjednavkyController extends Controller
 
     private function renderFakturyData($params)
     {
-        $users = $this->userManager->selectUsersEmails();
-        $dopravy = $this->orderManager->selectShippingVariants();
-        $platby = $this->orderManager->selectPaymentVariants();
-        $this->data = ["payments" => $platby, "shipping" => $dopravy, "users" => $users];
-        echo(json_encode(
-            $this->data
-        ));
+        if (isset($params[0])) {
+            if ($params[0] === "userInfo") {
+                echo(json_encode(
+                    $this->userManager->selectUsersInvoiceInfo($params[1])
+                ));
+            }
+        } else {
+            $users = $this->userManager->selectUsersEmails();
+            $dopravy = $this->orderManager->selectShippingVariants();
+            $platby = $this->orderManager->selectPaymentVariants();
+            $orderNumber = $this->orderManager->newOrderNumber();
+            $eshopInfo = $this->orderManager->selectEshopInvoiceInfo();
+            $this->data = ["payments" => $platby, "shipping" => $dopravy, "users" => $users, "number" => $orderNumber, "eshopInfo" => $eshopInfo];
+            echo(json_encode(
+                $this->data
+            ));
+        }
+
     }
 }
