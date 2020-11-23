@@ -12,10 +12,18 @@
   flex-flow: row nowrap;
   align-items: flex-end;
   justify-content: space-between;
-  padding: 20px;
-  padding-right: 75px;
+  padding: 20px 75px 20px 20px;
 }
 .address-row{
   background-color: #e47d5c;
   color: white;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 50px;
+  font-size: 13px;
+}
+.eshop-info-container{
+  width: 40%;
 }

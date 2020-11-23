@@ -1,16 +1,4 @@
 // noinspection JSXNamespaceValidation
-class Invoice extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return (
-        <h3>{this.props.name}</h3>
-        )
-    }
-
-}
 
 class App extends React.Component {
     constructor(props) {
@@ -23,7 +11,10 @@ class App extends React.Component {
             payment: "",
             shipping: "",
             user: "",
-            userInfo:[]
+            vystaveni: "",
+            plneni: "",
+            splatnost: "",
+            userInfo: []
         };
         this.handleChange = this.handleChange.bind(this);
     }
@@ -46,8 +37,9 @@ class App extends React.Component {
                 }
             )
     }
-    getUserInfo(email){
-        fetch("objednavky/faktury/data/userInfo/"+email)
+
+    getUserInfo(email) {
+        fetch("objednavky/faktury/data/userInfo/" + email)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -62,9 +54,10 @@ class App extends React.Component {
                 }
             )
     }
+
     handleChange(value, type) {
         this.setState({[type]: value});
-        if(type === "user"){
+        if (type === "user") {
             this.getUserInfo(value)
         }
     }
@@ -80,12 +73,23 @@ class App extends React.Component {
                     <InvoiceGeneratorSelect name={"Platba"} type={"payment"} items={this.state.formData.payments} value={this.state["payment"]} onValueChange={this.handleChange}/>
                     <InvoiceGeneratorSelect name={"Doprava"} type={"shipping"} items={this.state.formData.shipping} value={this.state["shipping"]} onValueChange={this.handleChange}/>
                     <InvoiceGeneratorSelect name={"Zákazník"} type={"user"} items={this.state.formData.users} value={this.state["user"]} onValueChange={this.handleChange}/>
-                    <InvoicePage name={this.state.invoiceType} number={this.state.formData.number} eshopInfo={this.state.formData.eshopInfo} userInfo={this.state.userInfo}/>
+                    <DateSelect type={"vystaveni"} onValueChange={this.handleChange}/>
+                    <DateSelect type={"plneni"} onValueChange={this.handleChange}/>
+                    <DateSelect type={"splatnost"} onValueChange={this.handleChange}/>
+                    <InvoicePage
+                        name={this.state.invoiceType}
+                        number={this.state.formData.number}
+                        eshopInfo={this.state.formData.eshopInfo}
+                        userInfo={this.state.userInfo}
+                        vystaveni={this.state.vystaveni}
+                        plneni={this.state.plneni}
+                        splatnost={this.state.splatnost}
+                    />
                 </div>
             )
         } else {
             return (
-                    <div>Loading...</div>
+                <div>Loading...</div>
             )
         }
     }
@@ -96,43 +100,48 @@ class InvoicePage extends React.Component {
     constructor(props) {
         super(props);
     }
+
     render() {
-        const {name,number,eshopInfo,userInfo} = this.props;
-            return (
-                <div id={"invoice-container"}>
-                    <div className={"invoice-header"}>
-                        <img src={"www/images/pastel-logo.svg"} alt={"shop-logo"} height={50}/> <h3>{name} {number}</h3>
+        const {name, number, eshopInfo, userInfo,vystaveni,plneni,splatnost} = this.props;
+        return (
+            <div id={"invoice-container"}>
+                <div className={"invoice-header"}>
+                    <img src={"www/images/pastel-logo.svg"} alt={"shop-logo"} height={50}/> <h3>{name} {number}</h3>
+                </div>
+                <div className={"address-row"}>
+                    <div className={"eshop-info-container"}>
+                        <h4>Dodavatel:</h4>
+                        <p>{eshopInfo.firm_name}</p>
+                        <p>{eshopInfo.adress1}</p>
+                        <p>{eshopInfo.adress2}</p>
+                        <p>{eshopInfo.city} {eshopInfo.zipcode}</p>
+                        <p>{eshopInfo.country}</p>
+                        <p>{eshopInfo.DIC}</p>
+                        <p>{eshopInfo.IC}</p>
                     </div>
-                    <div className={"address-row"}>
-                        {console.log(eshopInfo)}
-                        {console.log(userInfo)}
-                        <div className={"eshop-info-container"}>
-                            <h4>Dodavatel:</h4>
-                            <p>{eshopInfo.firm_name}</p>
-                            <p>{eshopInfo.adress1}</p>
-                            <p>{eshopInfo.adress2}</p>
-                            <p>{eshopInfo.city} {eshopInfo.zipcode}</p>
-                            <p>{eshopInfo.country}</p>
-                            <p>{eshopInfo.DIC}</p>
-                            <p>{eshopInfo.IC}</p>
-                        </div>
-                        <div className={"eshop-info-container"}>
-                            <h4>Odběratel:</h4>
-                            <p>{userInfo.firm_name}</p>
-                            <p>{userInfo.first_name} {userInfo.last_name}</p>
-                            <p>{userInfo.email} </p><p>{userInfo.area_code}{userInfo.phone}</p>
-                            <p>{userInfo.adress1}</p>
-                            <p>{userInfo.adress2}</p>
-                            <p>{userInfo.city} {userInfo.zipcode}</p>
-                            <p>{userInfo.country}</p>
-                            <p>{userInfo.DIC}</p>
-                            <p>{userInfo.IC}</p>
-                        </div>
+                    <div className={"eshop-info-container"}>
+                        <h4>Odběratel:</h4>
+                        <p>{userInfo.firm_name}</p>
+                        <p>{userInfo.first_name} {userInfo.last_name}</p>
+                        <p>{userInfo.email} </p><p>{userInfo.area_code}{userInfo.phone}</p>
+                        <p>{userInfo.adress1}</p>
+                        <p>{userInfo.adress2}</p>
+                        <p>{userInfo.city} {userInfo.zipcode}</p>
+                        <p>{userInfo.country}</p>
+                        <p>{userInfo.DIC}</p>
+                        <p>{userInfo.IC}</p>
                     </div>
                 </div>
-            )
+                <div class={"tax-info"}>
+                    Datum vystavení: {vystaveni}
+                    Datum zdan. plnění: {plneni}
+                    Datum splatnosti: {splatnost}
+                </div>
+            </div>
+        )
     }
 }
+
 class InvoiceGeneratorSelect extends React.Component {
 
     constructor(props) {
@@ -165,102 +174,52 @@ class InvoiceGeneratorSelect extends React.Component {
     }
 }
 
+class DateSelect extends React.Component {
+
+    constructor(props) {
+        super(props);
+        const date = new Date();
+        this.state = {
+            date: getFormatedDate(date)
+        }
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange(e) {
+        this.setState({date: e.target.value});
+        this.props.onValueChange(e.target.value, this.props.type);
+    }
+
+    componentDidMount() {
+        this.props.onValueChange(this.state.date, this.props.type);
+    }
+
+    render() {
+        const {type, name} = this.props;
+        return (
+            <div className={"input-group container-fluid"}>
+                <label htmlFor={type + "-select"}>{name}</label>
+                <input className="form-control" type="date" value={this.state.date} id={type + "-select"} onChange={this.handleChange}/>
+            </div>
+        );
+    }
+}
+
 ReactDOM.render(
     <App/>
     ,
     document.getElementById('invoice-app')
 );
 
-/*-------------------------------------------------------------------------------------------------------------------------------*/
-
-const scaleNames = {
-    c: 'Celsius',
-    f: 'Fahrenheit'
-};
-
-function toCelsius(fahrenheit) {
-    return (fahrenheit - 32) * 5 / 9;
-}
-
-function toFahrenheit(celsius) {
-    return (celsius * 9 / 5) + 32;
-}
-
-function tryConvert(temperature, convert) {
-    const input = parseFloat(temperature);
-    if (Number.isNaN(input)) {
-        return '';
+let getFormatedDate = function (date) {
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    if (month < 10) {
+        month = (0 + month.toString())
     }
-    const output = convert(input);
-    const rounded = Math.round(output * 1000) / 1000;
-    return rounded.toString();
-}
-
-function BoilingVerdict(props) {
-    if (props.celsius >= 100) {
-        return <p>The water would boil.</p>;
+    if (day < 10) {
+        day = (0 + day.toString())
     }
-    return <p>The water would not boil.</p>;
-}
-
-class TemperatureInput extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    handleChange(e) {
-        this.props.onTemperatureChange(e.target.value);
-    }
-
-    render() {
-        const temperature = this.props.temperature;
-        const scale = this.props.scale;
-        return (
-            <fieldset>
-                <legend>Enter temperature in {scaleNames[scale]}:</legend>
-                <input value={temperature}
-                       onChange={this.handleChange}/>
-            </fieldset>
-        );
-    }
-}
-
-class Calculator extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleCelsiusChange = this.handleCelsiusChange.bind(this);
-        this.handleFahrenheitChange = this.handleFahrenheitChange.bind(this);
-        this.state = {temperature: '', scale: 'c'};
-    }
-
-    handleCelsiusChange(temperature) {
-        this.setState({scale: 'c', temperature});
-    }
-
-    handleFahrenheitChange(temperature) {
-        this.setState({scale: 'f', temperature});
-    }
-
-    render() {
-        const scale = this.state.scale;
-        const temperature = this.state.temperature;
-        const celsius = scale === 'f' ? tryConvert(temperature, toCelsius) : temperature;
-        const fahrenheit = scale === 'c' ? tryConvert(temperature, toFahrenheit) : temperature;
-
-        return (
-            <div>
-                <TemperatureInput
-                    scale="c"
-                    temperature={celsius}
-                    onTemperatureChange={this.handleCelsiusChange}/>
-                <TemperatureInput
-                    scale="f"
-                    temperature={fahrenheit}
-                    onTemperatureChange={this.handleFahrenheitChange}/>
-                <BoilingVerdict
-                    celsius={parseFloat(celsius)}/>
-            </div>
-        );
-    }
+    return (year.toString() + "-" + month.toString() + "-" + day.toString())
 }
