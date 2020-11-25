@@ -103,6 +103,7 @@ class InvoicePage extends React.Component {
 
     render() {
         const {name, number, eshopInfo, userInfo,vystaveni,plneni,splatnost} = this.props;
+
         return (
             <div id={"invoice-container"}>
                 <div className={"invoice-header"}>
@@ -132,10 +133,10 @@ class InvoicePage extends React.Component {
                         <p>{userInfo.IC}</p>
                     </div>
                 </div>
-                <div class={"tax-info"}>
-                    Datum vystavení: {vystaveni}
-                    Datum zdan. plnění: {plneni}
-                    Datum splatnosti: {splatnost}
+                <div className={"tax-info"}>
+                    Datum vystavení: {standardDateFormat(vystaveni)}
+                    Datum zdan. plnění: {standardDateFormat(plneni)}
+                    Datum splatnosti: {standardDateFormat(splatnost)}
                 </div>
             </div>
         )
@@ -222,4 +223,8 @@ let getFormatedDate = function (date) {
         day = (0 + day.toString())
     }
     return (year.toString() + "-" + month.toString() + "-" + day.toString())
+}
+let standardDateFormat = function (date) {
+    let dates = date.split("-");
+    return dates[2]+"."+dates[1]+"."+dates[0];
 }

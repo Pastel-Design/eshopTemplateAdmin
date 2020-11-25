@@ -16,12 +16,12 @@ class OrderManager
 
     public function selectShippingVariants()
     {
-        return DbManager::requestMultiple("SELECT id,name FROM shipping");
+        return DbManager::requestMultiple("SELECT id,name,price FROM shipping");
     }
 
     public function selectPaymentVariants()
     {
-        return DbManager::requestMultiple("SELECT id,name FROM payment");
+        return DbManager::requestMultiple("SELECT id,name,price FROM payment");
     }
 
     public function newOrderNumber()
