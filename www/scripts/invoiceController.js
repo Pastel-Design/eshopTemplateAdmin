@@ -252,11 +252,7 @@ class ProductSelect extends React.Component {
         if(e.target.value !==""){
             const response = await fetch("objednavky/faktury/hledatProdukty/" + e.target.value);
             const results = await response.json();
-            let newResults =[];
-            results.forEach(item=>{
-                newResults.push(Object.values(item))
-            })
-            this.setState({results: newResults});
+            this.setState({results: results});
         }else{
             this.setState({results: []});
         }
@@ -283,9 +279,14 @@ class SearchResults extends React.Component {
     }
 
     render() {
+        const items = this.props.results;
         return (
             <div className={"ProductSelect"}>
-                {this.props.results}
+                {items.map(item => (
+                    <div key={item.id} >
+                        {item.name} <button className={"btn btn-info"}>+</button>
+                    </div>
+                ))}
             </div>
         )
     }
