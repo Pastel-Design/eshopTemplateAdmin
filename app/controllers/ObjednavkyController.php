@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\OrderManager;
+use app\models\ProductManager;
 use app\models\UserManager;
 
 /**
@@ -14,12 +15,14 @@ class ObjednavkyController extends Controller
 {
     private OrderManager $orderManager;
     private UserManager $userManager;
+    private ProductManager $productManager;
 
     public function __construct()
     {
         parent::__construct();
         $this->orderManager = new OrderManager();
         $this->userManager = new UserManager();
+        $this->productManager = new ProductManager();
     }
 
     /**
@@ -76,8 +79,6 @@ class ObjednavkyController extends Controller
 
     private function renderFakturyNova($params)
     {
-
-
         $this->head['page_title'] = "Objednávky";
         $this->head['page_keywords'] = "";
         $this->head['page_description'] = "";
@@ -103,6 +104,13 @@ class ObjednavkyController extends Controller
                 $this->data
             ));
         }
+    }
 
+    private function renderFakturyHledatprodukty($params)
+    {
+        $produkty = $this->productManager->searchProducts($params[0]);
+        echo(json_encode(
+            $produkty
+        ));
     }
 }

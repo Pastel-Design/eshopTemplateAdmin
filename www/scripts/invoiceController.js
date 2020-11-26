@@ -62,6 +62,10 @@ class App extends React.Component {
         }
     }
 
+    addProduct(product) {
+
+    }
+
     render() {
         let invoiceType = [{"name": "Faktura", "id": 1}, {"name": "Dobropis", "id": 2}]
 
@@ -76,6 +80,7 @@ class App extends React.Component {
                     <DateSelect type={"vystaveni"} onValueChange={this.handleChange}/>
                     <DateSelect type={"plneni"} onValueChange={this.handleChange}/>
                     <DateSelect type={"splatnost"} onValueChange={this.handleChange}/>
+                    <ProductSelect selectedProduct={this.addProduct}/>
                     <InvoicePage
                         name={this.state.invoiceType}
                         number={this.state.formData.number}
@@ -102,7 +107,7 @@ class InvoicePage extends React.Component {
     }
 
     render() {
-        const {name, number, eshopInfo, userInfo,vystaveni,plneni,splatnost} = this.props;
+        const {name, number, eshopInfo, userInfo, vystaveni, plneni, splatnost} = this.props;
 
         return (
             <div id={"invoice-container"}>
@@ -148,22 +153,25 @@ class InvoiceGeneratorSelect extends React.Component {
     constructor(props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
+        this.state = {
+            value: "-"
+        }
     }
 
     handleChange(e) {
         this.props.onValueChange(e.target.value, this.props.type);
-    }
-
-    componentDidMount() {
-        this.props.onValueChange(this.props.items[0]["name"], this.props.type);
+        this.setState({value: e.target.value});
     }
 
     render() {
-        const {type, items, value, name} = this.props;
+        const {type, items, name} = this.props;
         return (
             <div className={"input-group container-fluid"}>
                 <label htmlFor={type + "-select"}>{name}</label>
-                <select id={type + "-select"} name={type} className="form-control" value={value} onChange={this.handleChange}>
+                <select id={type + "-select"} name={type} className="form-control" value={this.state.value} onChange={this.handleChange}>
+                    <option key={0} value={"-"}>
+                        -
+                    </option>
                     {items.map(item => (
                         <option key={item.id} value={item.name}>
                             {item.name}
@@ -226,5 +234,59 @@ let getFormatedDate = function (date) {
 }
 let standardDateFormat = function (date) {
     let dates = date.split("-");
-    return dates[2]+"."+dates[1]+"."+dates[0];
+    return dates[2] + "." + dates[1] + "." + dates[0];
+}
+
+class ProductSelect extends React.Component {
+    constructor(props) {
+        super(props);
+        this.searchProduct = this.searchProduct.bind(this);
+        this.state = {
+            results: [],
+            value: ""
+        }
+    }
+
+    async searchProduct(e) {
+        this.setState({value:e.target.value})
+        if(e.target.value !==""){
+            const response = await fetch("objednavky/faktury/hledatProdukty/" + e.target.value);
+            const results = await response.json();
+            let newResults =[];
+            results.forEach(item=>{
+                newResults.push(Object.values(item))
+            })
+            this.setState({results: newResults});
+        }else{
+            this.setState({results: []});
+        }
+    }
+
+    selectProduct(product) {
+        this.props.selectedProduct(product);
+    }
+
+    render() {
+        return (
+            <div className={"ProductSelect"}>
+                <label htmlFor={"product-select"}>Přidat produkty</label>
+                <input className="form-control" type="text" value={this.state.value} id={"product-select"} onChange={this.searchProduct}/>
+                <SearchResults results={this.state.results} selectedOne={this.selectProduct}/>
+            </div>
+        )
+    }
+}
+
+class SearchResults extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className={"ProductSelect"}>
+                {this.props.results}
+            </div>
+        )
+    }
 }
