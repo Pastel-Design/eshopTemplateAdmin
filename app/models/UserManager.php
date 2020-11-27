@@ -55,9 +55,9 @@ class UserManager
         foreach ($users as $user) {
             $invoice = DbManager::requestUnit('SELECT COUNT(id) FROM invoice_address WHERE user_id = ?', [$user["id"]]);
             $shipping = DbManager::requestUnit('SELECT COUNT(id) FROM shipping_address WHERE user_id = ?', [$user["id"]]);
-            $user["shipping"]=$shipping;
-            $user["invoice"]=$invoice;
-            $newUsers[]=$user;
+            $user["shipping"] = $shipping;
+            $user["invoice"] = $invoice;
+            $newUsers[] = $user;
         }
         return $newUsers;
     }
@@ -69,12 +69,18 @@ class UserManager
 
     public function selectUsersInvoiceInfo($email)
     {
-        return DbManager::requestSingle("SELECT * FROM invoice_address WHERE user_id=?",[$this->getUserId($email)]);
+        return DbManager::requestSingle("SELECT * FROM invoice_address WHERE user_id=?", [$this->getUserId($email)]);
 
     }
 
     private function getUserId($login)
     {
-        return DbManager::requestUnit("SELECT id FROM user WHERE email = ? OR username = ?",[$login,$login]);
+        return DbManager::requestUnit("SELECT id FROM user WHERE email = ? OR username = ?", [$login, $login]);
+    }
+
+    public function searchUsers($value)
+    {
+        $value = urldecode($value);
+        return (DbManager::requestMultiple("SELECT id,email as name FROM user WHERE email LIKE ?", ["%" . $value . "%"]));
     }
 }

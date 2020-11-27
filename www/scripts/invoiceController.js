@@ -17,6 +17,7 @@ class App extends React.Component {
             userInfo: []
         };
         this.handleChange = this.handleChange.bind(this);
+        this.addUser = this.addUser.bind(this);
     }
 
     componentDidMount() {
@@ -57,13 +58,11 @@ class App extends React.Component {
 
     handleChange(value, type) {
         this.setState({[type]: value});
-        if (type === "user") {
-            this.getUserInfo(value)
-        }
     }
 
-    addProduct(product) {
-
+    addUser(user) {
+        this.setState({user: user});
+        this.getUserInfo(user)
     }
 
     render() {
@@ -76,11 +75,10 @@ class App extends React.Component {
                     <InvoiceGeneratorSelect name={"Typ faktury"} type={"invoiceType"} items={invoiceType} value={this.state["invoiceType"]} onValueChange={this.handleChange}/>
                     <InvoiceGeneratorSelect name={"Platba"} type={"payment"} items={this.state.formData.payments} value={this.state["payment"]} onValueChange={this.handleChange}/>
                     <InvoiceGeneratorSelect name={"Doprava"} type={"shipping"} items={this.state.formData.shipping} value={this.state["shipping"]} onValueChange={this.handleChange}/>
-                    <InvoiceGeneratorSelect name={"Zákazník"} type={"user"} items={this.state.formData.users} value={this.state["user"]} onValueChange={this.handleChange}/>
                     <DateSelect type={"vystaveni"} onValueChange={this.handleChange}/>
                     <DateSelect type={"plneni"} onValueChange={this.handleChange}/>
                     <DateSelect type={"splatnost"} onValueChange={this.handleChange}/>
-                    <ProductSelect selectedProduct={this.addProduct}/>
+                    <UserSelect selectedUser={this.addUser}/>
                     <InvoicePage
                         name={this.state.invoiceType}
                         number={this.state.formData.number}
@@ -237,20 +235,21 @@ let standardDateFormat = function (date) {
     return dates[2] + "." + dates[1] + "." + dates[0];
 }
 
-class ProductSelect extends React.Component {
+class UserSelect extends React.Component {
     constructor(props) {
         super(props);
-        this.searchProduct = this.searchProduct.bind(this);
+        this.searchUser = this.searchUser.bind(this);
+        this.selectUser = this.selectUser.bind(this);
         this.state = {
             results: [],
             value: ""
         }
     }
 
-    async searchProduct(e) {
+    async searchUser(e) {
         this.setState({value:e.target.value})
         if(e.target.value !==""){
-            const response = await fetch("objednavky/faktury/hledatProdukty/" + e.target.value);
+            const response = await fetch("objednavky/faktury/hledatUzivatele/" + e.target.value);
             const results = await response.json();
             this.setState({results: results});
         }else{
@@ -258,16 +257,16 @@ class ProductSelect extends React.Component {
         }
     }
 
-    selectProduct(product) {
-        this.props.selectedProduct(product);
+    selectUser(user) {
+        this.props.selectedUser(user);
     }
 
     render() {
         return (
-            <div className={"ProductSelect"}>
-                <label htmlFor={"product-select"}>Přidat produkty</label>
-                <input className="form-control" type="text" value={this.state.value} id={"product-select"} onChange={this.searchProduct}/>
-                <SearchResults results={this.state.results} selectedOne={this.selectProduct}/>
+            <div className={"UserSelect"}>
+                <label htmlFor={"product-select"}>Vybrat uživatele</label>
+                <input className="form-control" type="text" value={this.state.value} id={"product-select"} onChange={this.searchUser}/>
+                <SearchResults results={this.state.results} selectedOne={this.selectUser}/>
             </div>
         )
     }
@@ -276,15 +275,20 @@ class ProductSelect extends React.Component {
 class SearchResults extends React.Component {
     constructor(props) {
         super(props);
+        this.selectUser = this.selectUser.bind(this);
+    }
+
+    selectUser(e){
+        this.props.selectedOne(e.target.getAttribute("useremail"));
     }
 
     render() {
         const items = this.props.results;
         return (
-            <div className={"ProductSelect"}>
+            <div className={"UserSelect"}>
                 {items.map(item => (
                     <div key={item.id} >
-                        {item.name} <button className={"btn btn-info"}>+</button>
+                        {item.name} <button className={"btn btn-info"} useremail={item.name} onClick={this.selectUser}>+</button>
                     </div>
                 ))}
             </div>
