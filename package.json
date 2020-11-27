@@ -1,5 +1,5 @@
 {
-  "name": "eshopTemplateAdmin",
+  "name": "eshop-template-admin",
   "version": "1.0.0",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",

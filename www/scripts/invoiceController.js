@@ -259,6 +259,8 @@ class UserSelect extends React.Component {
 
     selectUser(user) {
         this.props.selectedUser(user);
+        this.setState({value: ""})
+        this.setState({results: []});
     }
 
     render() {
