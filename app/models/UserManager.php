@@ -84,6 +84,12 @@ class UserManager
     public function searchUsers($value)
     {
         $value = urldecode($value);
-        return (DbManager::requestMultiple("SELECT id,email as name, email as dashName FROM user WHERE email LIKE ?", ["%" . $value . "%"]));
+        $users = (DbManager::requestMultiple("SELECT id,email as name, email as dashName FROM user WHERE email LIKE ?", ["%" . $value . "%"]));
+        $newUsers = array();
+        foreach ($users as $user){
+            $user["image"]="avatar.jpg";
+            $newUsers[]=$user;
+        }
+        return $newUsers;
     }
 }

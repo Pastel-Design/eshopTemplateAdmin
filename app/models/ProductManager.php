@@ -117,12 +117,36 @@ class ProductManager
     public function searchProducts($value)
     {
         $value = urldecode($value);
-        return (DbManager::requestMultiple("SELECT id,name,dash_name as dashName FROM product WHERE name LIKE ?", ["%" . $value . "%"]));
+        $products = (DbManager::requestMultiple("SELECT id,name,dash_name as dashName FROM product WHERE name LIKE ?", ["%" . $value . "%"]));
+        $newProducts = array();
+        foreach ($products as $product) {
+            $image = DbManager::requestSingle(
+            'SELECT CONCAT(image.name,".",image.data_type) as image FROM image 
+            JOIN image_has_product ihp on image.id = ihp.image_id 
+            JOIN product p on ihp.product_id = p.id 
+            WHERE p.id = ? AND ihp.main_image=1',
+                [$product["id"]]);
+            if(!$image){
+                $image="default.jpg";
+            }else{
+                $image = $image["image"];
+            }
+            $product["image"] = $image;
+            $newProducts[] = $product;
+        }
+        return $newProducts;
+
     }
 
     public function getProductInvoiceInfo($value)
     {
         $value = urldecode($value);
-        return (DbManager::requestMultiple("SELECT id,name,dash_name as dashName, price, dph FROM product WHERE dash_name = ?", [$value]));
+        $products = (DbManager::requestMultiple("SELECT id,name,dash_name as dashName, price, dph FROM product WHERE dash_name = ?", [$value]));
+        $newProducts = array();
+        foreach ($products as $product) {
+            $product["image"] = DbManager::requestSingle("SELECT CONCAT(image.name+image.data_type) FROM image JOIN image_has_product ihp on image.id = ihp.image_id JOIN product p on ihp.product_id = p.id WHERE p.id = ? AND ihp.main_image=1" [$product["id"]]);
+            $newProducts[] = $product;
+        }
+        return $newProducts;
     }
 }

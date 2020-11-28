@@ -170,35 +170,38 @@ class InvoicePage extends React.Component {
                 <div className={"invoice-header"}>
                     <img src={"www/images/pastel-logo.svg"} alt={"shop-logo"} height={50}/> <h3>{name} {number}</h3>
                 </div>
-                <div className={"address-row"}>
-                    <div className={"eshop-info-container"}>
-                        <h4>Dodavatel:</h4>
-                        <p>{eshopInfo.firm_name}</p>
-                        <p>{eshopInfo.adress1}</p>
-                        <p>{eshopInfo.adress2}</p>
-                        <p>{eshopInfo.city} {eshopInfo.zipcode}</p>
-                        <p>{eshopInfo.country}</p>
-                        <p>{eshopInfo.DIC}</p>
-                        <p>{eshopInfo.IC}</p>
+                <div className={"tax-row"}>
+                    <div className={"address-row"}>
+                        <div className={"eshop-info-container"}>
+                            <h4>Dodavatel:</h4>
+                            <p>{eshopInfo.firm_name}</p>
+                            <p>{eshopInfo.adress1}</p>
+                            <p>{eshopInfo.adress2}</p>
+                            <p>{eshopInfo.city} {eshopInfo.zipcode}</p>
+                            <p>{eshopInfo.country}</p>
+                            <p>{eshopInfo.DIC}</p>
+                            <p>{eshopInfo.IC}</p>
+                        </div>
+                        <div className={"eshop-info-container"}>
+                            <h4>Odběratel:</h4>
+                            <p>{userInfo.firm_name}</p>
+                            <p>{userInfo.first_name} {userInfo.last_name}</p>
+                            <p>{userInfo.email} </p><p>{userInfo.area_code}{userInfo.phone}</p>
+                            <p>{userInfo.adress1}</p>
+                            <p>{userInfo.adress2}</p>
+                            <p>{userInfo.city} {userInfo.zipcode}</p>
+                            <p>{userInfo.country}</p>
+                            <p>{userInfo.DIC}</p>
+                            <p>{userInfo.IC}</p>
+                        </div>
                     </div>
-                    <div className={"eshop-info-container"}>
-                        <h4>Odběratel:</h4>
-                        <p>{userInfo.firm_name}</p>
-                        <p>{userInfo.first_name} {userInfo.last_name}</p>
-                        <p>{userInfo.email} </p><p>{userInfo.area_code}{userInfo.phone}</p>
-                        <p>{userInfo.adress1}</p>
-                        <p>{userInfo.adress2}</p>
-                        <p>{userInfo.city} {userInfo.zipcode}</p>
-                        <p>{userInfo.country}</p>
-                        <p>{userInfo.DIC}</p>
-                        <p>{userInfo.IC}</p>
+                    <div className={"tax-info"}>
+                        <p>Datum vystavení: {standardDateFormat(vystaveni)}</p>
+                        <p>Datum zdan. plnění: {standardDateFormat(plneni)}</p>
+                        <p>Datum splatnosti: {standardDateFormat(splatnost)}</p>
                     </div>
                 </div>
-                <div className={"tax-info"}>
-                    Datum vystavení: {standardDateFormat(vystaveni)}
-                    Datum zdan. plnění: {standardDateFormat(plneni)}
-                    Datum splatnosti: {standardDateFormat(splatnost)}
-                </div>
+
             </div>
         )
     }
@@ -325,6 +328,7 @@ class ProductSelect extends React.Component {
         this.setState({value: e.target.value})
         if (e.target.value !== "") {
             const response = await fetch("objednavky/faktury/hledatProdukty/" + e.target.value);
+            console.log(response)
             const results = await response.json();
             this.setState({results: results});
         } else {
@@ -367,10 +371,12 @@ class SearchResults extends React.Component {
                 <div></div>
             )
         } else {
+            console.log(items);
             return (
                 <div className={"search-results"}>
                     {items.map(item => (
                         <div key={item.id}>
+                            <img src={"images/" + item.image} height={"40px"}/>
                             {item.name}
                             <button className={"btn btn-info"} value={item.dashName} onClick={this.selectItem}>Přidat</button>
                         </div>
