@@ -117,6 +117,12 @@ class ProductManager
     public function searchProducts($value)
     {
         $value = urldecode($value);
-        return (DbManager::requestMultiple("SELECT id,name,dash_name FROM product WHERE name LIKE ?", ["%" . $value . "%"]));
+        return (DbManager::requestMultiple("SELECT id,name,dash_name as dashName FROM product WHERE name LIKE ?", ["%" . $value . "%"]));
+    }
+
+    public function getProductInvoiceInfo($value)
+    {
+        $value = urldecode($value);
+        return (DbManager::requestMultiple("SELECT id,name,dash_name as dashName, price, dph FROM product WHERE dash_name = ?", [$value]));
     }
 }

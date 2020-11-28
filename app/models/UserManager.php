@@ -43,8 +43,9 @@ class UserManager
      *
      * @return array
      */
-    public function selectUsers(int $limit = 50, $offset = 1)
+    public function selectUsers(int $limit = 50, $offset = 0)
     {
+        $offset = $limit*$offset;
         $users = DbManager::requestMultiple(' 
         SELECT user.id as "id",email,username,phone,area_code,orders,activated,registered,last_active,first_name,last_name,role.level as "level",role.name as "role_name"
         FROM user JOIN role ON role.id = user.role_id
@@ -57,6 +58,8 @@ class UserManager
             $shipping = DbManager::requestUnit('SELECT COUNT(id) FROM shipping_address WHERE user_id = ?', [$user["id"]]);
             $user["shipping"] = $shipping;
             $user["invoice"] = $invoice;
+            $user["last_active"] = UserFunctionsManager::getFormatedDate($user["last_active"]);
+            $user["registered"] = UserFunctionsManager::getFormatedDate($user["registered"]);
             $newUsers[] = $user;
         }
         return $newUsers;
@@ -81,6 +84,6 @@ class UserManager
     public function searchUsers($value)
     {
         $value = urldecode($value);
-        return (DbManager::requestMultiple("SELECT id,email as name FROM user WHERE email LIKE ?", ["%" . $value . "%"]));
+        return (DbManager::requestMultiple("SELECT id,email as name, email as dashName FROM user WHERE email LIKE ?", ["%" . $value . "%"]));
     }
 }

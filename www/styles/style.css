@@ -85,6 +85,23 @@
   width: 40%;
 }
 
+.select-group {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.search-results {
+  border: 1px solid #cccccc;
+  padding: 10px;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.search-results > div {
+  margin: 2px;
+}
+
 p {
   margin-bottom: 0;
 }

@@ -106,6 +106,22 @@ class ObjednavkyController extends Controller
         }
     }
 
+    private function renderFakturyProdukt($params)
+    {
+        $product = $this->productManager->getProductInvoiceInfo($params[0]);
+        echo(json_encode(
+            $product
+        ));
+    }
+
+    private function renderFakturyHledatprodukty($params)
+    {
+        $products = $this->productManager->searchProducts($params[0]);
+        echo(json_encode(
+            $products
+        ));
+    }
+
     private function renderFakturyHledatuzivatele($params)
     {
         $uzivatele = $this->userManager->searchUsers($params[0]);

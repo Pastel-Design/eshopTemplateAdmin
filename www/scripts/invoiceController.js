@@ -11,6 +11,7 @@ class App extends React.Component {
             payment: "",
             shipping: "",
             user: "",
+            products: {},
             vystaveni: "",
             plneni: "",
             splatnost: "",
@@ -18,6 +19,8 @@ class App extends React.Component {
         };
         this.handleChange = this.handleChange.bind(this);
         this.addUser = this.addUser.bind(this);
+        this.addProduct = this.addProduct.bind(this);
+        this.productChange = this.productChange.bind(this);
     }
 
     componentDidMount() {
@@ -65,6 +68,54 @@ class App extends React.Component {
         this.getUserInfo(user)
     }
 
+    async addProduct(product) {
+        const response = await fetch("objednavky/faktury/produkt/" + product);
+        let productInfo = await response.json()
+        let stateProducts = this.state.products;
+        if (product in stateProducts) {
+            stateProducts[product].count++;
+        } else {
+            productInfo[0].count = 1;
+            stateProducts[product] = productInfo[0]
+        }
+        this.setState({products: stateProducts});
+        console.log(this.state.products)
+    }
+
+    productChange(type, value, product) {
+        let isNumber = function (str) {
+            let pattern = /^\d+$/;
+            return pattern.test(str);
+        }
+        let isPriceNumber = function (str) {
+            let pattern = /^\d+(,\d{3})*(\.\d{1,2})?$/;
+            return pattern.test(str);
+        }
+        if (type === "price") {
+            if (isPriceNumber(value)) {
+                let stateProducts = this.state.products;
+                stateProducts[product][type] = value;
+                this.setState({products: stateProducts});
+            }
+            if (value === "") {
+                let stateProducts = this.state.products;
+                stateProducts[product][type] = value;
+                this.setState({products: stateProducts});
+            }
+        } else {
+            if (isNumber(value)) {
+                let stateProducts = this.state.products;
+                stateProducts[product][type] = value;
+                this.setState({products: stateProducts});
+            }
+            if (value === "") {
+                let stateProducts = this.state.products;
+                stateProducts[product][type] = value;
+                this.setState({products: stateProducts});
+            }
+        }
+    }
+
     render() {
         let invoiceType = [{"name": "Faktura", "id": 1}, {"name": "Dobropis", "id": 2}]
 
@@ -72,13 +123,19 @@ class App extends React.Component {
             return (
                 <div className={"container-fluid"}>
                     <h1>Nová faktura</h1>
-                    <InvoiceGeneratorSelect name={"Typ faktury"} type={"invoiceType"} items={invoiceType} value={this.state["invoiceType"]} onValueChange={this.handleChange}/>
-                    <InvoiceGeneratorSelect name={"Platba"} type={"payment"} items={this.state.formData.payments} value={this.state["payment"]} onValueChange={this.handleChange}/>
-                    <InvoiceGeneratorSelect name={"Doprava"} type={"shipping"} items={this.state.formData.shipping} value={this.state["shipping"]} onValueChange={this.handleChange}/>
-                    <DateSelect type={"vystaveni"} onValueChange={this.handleChange}/>
-                    <DateSelect type={"plneni"} onValueChange={this.handleChange}/>
-                    <DateSelect type={"splatnost"} onValueChange={this.handleChange}/>
-                    <UserSelect selectedUser={this.addUser}/>
+                    <div className={"select-group"}>
+                        <InvoiceDataSelect name={"Typ faktury"} type={"invoiceType"} items={invoiceType} value={this.state["invoiceType"]} onValueChange={this.handleChange}/>
+                        <InvoiceDataSelect name={"Platba"} type={"payment"} items={this.state.formData.payments} value={this.state["payment"]} onValueChange={this.handleChange}/>
+                        <InvoiceDataSelect name={"Doprava"} type={"shipping"} items={this.state.formData.shipping} value={this.state["shipping"]} onValueChange={this.handleChange}/>
+                    </div>
+                    <div className={"select-group"}>
+                        <DateSelect name={"Datum vystavení"} type={"vystaveni"} onValueChange={this.handleChange}/>
+                        <DateSelect name={"Datum zdanitelné plnění"} type={"plneni"} onValueChange={this.handleChange}/>
+                        <DateSelect name={"Datum splatnost"} type={"splatnost"} onValueChange={this.handleChange}/>
+                    </div>
+                    <UserSelect name={"Vybrat uživatele"} selectedUser={this.addUser}/>
+                    <ProductSelect name={"Přidat produkty"} selectedProduct={this.addProduct}/>
+                    <ProductsTable products={this.state.products} updateProduct={this.productChange}/>
                     <InvoicePage
                         name={this.state.invoiceType}
                         number={this.state.formData.number}
@@ -87,6 +144,7 @@ class App extends React.Component {
                         vystaveni={this.state.vystaveni}
                         plneni={this.state.plneni}
                         splatnost={this.state.splatnost}
+                        products={this.state.products}
                     />
                 </div>
             )
@@ -146,7 +204,7 @@ class InvoicePage extends React.Component {
     }
 }
 
-class InvoiceGeneratorSelect extends React.Component {
+class InvoiceDataSelect extends React.Component {
 
     constructor(props) {
         super(props);
@@ -164,7 +222,7 @@ class InvoiceGeneratorSelect extends React.Component {
     render() {
         const {type, items, name} = this.props;
         return (
-            <div className={"input-group container-fluid"}>
+            <div>
                 <label htmlFor={type + "-select"}>{name}</label>
                 <select id={type + "-select"} name={type} className="form-control" value={this.state.value} onChange={this.handleChange}>
                     <option key={0} value={"-"}>
@@ -204,11 +262,183 @@ class DateSelect extends React.Component {
     render() {
         const {type, name} = this.props;
         return (
-            <div className={"input-group container-fluid"}>
+            <div>
                 <label htmlFor={type + "-select"}>{name}</label>
                 <input className="form-control" type="date" value={this.state.date} id={type + "-select"} onChange={this.handleChange}/>
             </div>
         );
+    }
+}
+
+class UserSelect extends React.Component {
+    constructor(props) {
+        super(props);
+        this.searchUser = this.searchUser.bind(this);
+        this.selectUser = this.selectUser.bind(this);
+        this.state = {
+            results: [],
+            value: ""
+        }
+    }
+
+    async searchUser(e) {
+        this.setState({value: e.target.value})
+        if (e.target.value !== "") {
+            const response = await fetch("objednavky/faktury/hledatUzivatele/" + e.target.value);
+            const results = await response.json();
+            this.setState({results: results});
+        } else {
+            this.setState({results: []});
+        }
+    }
+
+    selectUser(user) {
+        this.props.selectedUser(user);
+        this.setState({value: ""})
+        this.setState({results: []});
+    }
+
+    render() {
+        const {name} = this.props;
+        return (
+            <div>
+                <label htmlFor={"user-select"}>{name}</label>
+                <input className="form-control" type="text" value={this.state.value} id={"user-select"} onChange={this.searchUser}/>
+                <SearchResults results={this.state.results} selectedOne={this.selectUser}/>
+            </div>
+        )
+    }
+}
+
+class ProductSelect extends React.Component {
+    constructor(props) {
+        super(props);
+        this.searchProduct = this.searchProduct.bind(this);
+        this.selectProduct = this.selectProduct.bind(this);
+        this.state = {
+            results: [],
+            value: ""
+        }
+    }
+
+    async searchProduct(e) {
+        this.setState({value: e.target.value})
+        if (e.target.value !== "") {
+            const response = await fetch("objednavky/faktury/hledatProdukty/" + e.target.value);
+            const results = await response.json();
+            this.setState({results: results});
+        } else {
+            this.setState({results: []});
+        }
+    }
+
+    selectProduct(product) {
+        this.props.selectedProduct(product);
+        this.setState({value: ""})
+        this.setState({results: []});
+    }
+
+    render() {
+        const {name} = this.props;
+        return (
+            <div>
+                <label htmlFor={"product-select"}>{name}</label>
+                <input className="form-control" type="text" value={this.state.value} id={"product-select"} onChange={this.searchProduct}/>
+                <SearchResults results={this.state.results} selectedOne={this.selectProduct}/>
+            </div>
+        )
+    }
+}
+
+class SearchResults extends React.Component {
+    constructor(props) {
+        super(props);
+        this.selectItem = this.selectItem.bind(this);
+    }
+
+    selectItem(e) {
+        this.props.selectedOne(e.target.getAttribute("value"));
+    }
+
+    render() {
+        const items = this.props.results;
+        if (Object.keys(items).length === 0) {
+            return (
+                <div></div>
+            )
+        } else {
+            return (
+                <div className={"search-results"}>
+                    {items.map(item => (
+                        <div key={item.id}>
+                            {item.name}
+                            <button className={"btn btn-info"} value={item.dashName} onClick={this.selectItem}>Přidat</button>
+                        </div>
+                    ))}
+                </div>
+            )
+        }
+
+    }
+}
+
+class ProductsTable extends React.Component {
+    constructor(props) {
+        super(props);
+        this.onChange = this.onChange.bind(this);
+    }
+
+    updateProduct(type, value, product) {
+        this.props.updateProduct(type, value, product);
+    }
+
+    onChange(e) {
+        let type = e.target.getAttribute("itemType");
+        let value = e.target.value;
+        let product = e.target.getAttribute("productname");
+        this.updateProduct(type, value, product)
+    }
+
+    render() {
+        const items = Object.values(this.props.products);
+        if (Object.keys(items).length === 0 && items.constructor === Object) {
+            return (
+                <div>
+                </div>
+            )
+        } else {
+            return (
+                <table className={"table table-striped"}>
+                    <thead>
+                    <tr>
+                        <th>Název</th>
+                        <th>Počet</th>
+                        <th>Jednotková cena</th>
+                        <th>Celková cena</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {items.map(item => (
+                        <tr key={item.id}>
+                            <td>
+                                {item.name}
+                            </td>
+                            <td>
+                                <input type={"text"} className={"form-control"} value={item.count} itemType={"count"} productname={item.dashName} onChange={this.onChange}/>
+                            </td>
+                            <td>
+                                <input type={"text"} className={"form-control"} value={item.price} itemType={"price"} productname={item.dashName} onChange={this.onChange}/>
+                            </td>
+                            <td>
+                                {item.price * item.count}
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            )
+
+        }
     }
 }
 
@@ -235,65 +465,3 @@ let standardDateFormat = function (date) {
     return dates[2] + "." + dates[1] + "." + dates[0];
 }
 
-class UserSelect extends React.Component {
-    constructor(props) {
-        super(props);
-        this.searchUser = this.searchUser.bind(this);
-        this.selectUser = this.selectUser.bind(this);
-        this.state = {
-            results: [],
-            value: ""
-        }
-    }
-
-    async searchUser(e) {
-        this.setState({value:e.target.value})
-        if(e.target.value !==""){
-            const response = await fetch("objednavky/faktury/hledatUzivatele/" + e.target.value);
-            const results = await response.json();
-            this.setState({results: results});
-        }else{
-            this.setState({results: []});
-        }
-    }
-
-    selectUser(user) {
-        this.props.selectedUser(user);
-        this.setState({value: ""})
-        this.setState({results: []});
-    }
-
-    render() {
-        return (
-            <div className={"UserSelect"}>
-                <label htmlFor={"product-select"}>Vybrat uživatele</label>
-                <input className="form-control" type="text" value={this.state.value} id={"product-select"} onChange={this.searchUser}/>
-                <SearchResults results={this.state.results} selectedOne={this.selectUser}/>
-            </div>
-        )
-    }
-}
-
-class SearchResults extends React.Component {
-    constructor(props) {
-        super(props);
-        this.selectUser = this.selectUser.bind(this);
-    }
-
-    selectUser(e){
-        this.props.selectedOne(e.target.getAttribute("useremail"));
-    }
-
-    render() {
-        const items = this.props.results;
-        return (
-            <div className={"UserSelect"}>
-                {items.map(item => (
-                    <div key={item.id} >
-                        {item.name} <button className={"btn btn-info"} useremail={item.name} onClick={this.selectUser}>+</button>
-                    </div>
-                ))}
-            </div>
-        )
-    }
-}
