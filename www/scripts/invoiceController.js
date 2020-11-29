@@ -21,6 +21,7 @@ class App extends React.Component {
         this.addUser = this.addUser.bind(this);
         this.addProduct = this.addProduct.bind(this);
         this.productChange = this.productChange.bind(this);
+        this.removeProduct = this.removeProduct.bind(this);
     }
 
     componentDidMount() {
@@ -79,7 +80,6 @@ class App extends React.Component {
             stateProducts[product] = productInfo[0]
         }
         this.setState({products: stateProducts});
-        console.log(this.state.products)
     }
 
     productChange(type, value, product) {
@@ -88,11 +88,12 @@ class App extends React.Component {
             return pattern.test(str);
         }
         let isPriceNumber = function (str) {
-            let pattern = /^\d+(,\d{3})*(\.\d{1,2})?$/;
+            let pattern = /^\d+(\.|,)?\d{0,2}$/;
             return pattern.test(str);
         }
         if (type === "price") {
             if (isPriceNumber(value)) {
+                value = value.replace(",", ".");
                 let stateProducts = this.state.products;
                 stateProducts[product][type] = value;
                 this.setState({products: stateProducts});
@@ -116,36 +117,48 @@ class App extends React.Component {
         }
     }
 
+    removeProduct(product) {
+        let products = this.state.products;
+        delete products[product];
+        this.setState({products: products})
+    }
+
     render() {
         let invoiceType = [{"name": "Faktura", "id": 1}, {"name": "Dobropis", "id": 2}]
 
         if (this.state.isLoaded) {
             return (
-                <div className={"container-fluid"}>
-                    <h1>Nová faktura</h1>
-                    <div className={"select-group"}>
-                        <InvoiceDataSelect name={"Typ faktury"} type={"invoiceType"} items={invoiceType} value={this.state["invoiceType"]} onValueChange={this.handleChange}/>
-                        <InvoiceDataSelect name={"Platba"} type={"payment"} items={this.state.formData.payments} value={this.state["payment"]} onValueChange={this.handleChange}/>
-                        <InvoiceDataSelect name={"Doprava"} type={"shipping"} items={this.state.formData.shipping} value={this.state["shipping"]} onValueChange={this.handleChange}/>
+                <div className={"invoice-generator-container"}>
+                    <div>
+                        <h1>Nová faktura</h1>
+                        <div className={"select-group"}>
+                            <InvoiceDataSelect name={"Typ faktury"} type={"invoiceType"} items={invoiceType} value={this.state["invoiceType"]} onValueChange={this.handleChange}/>
+                            <InvoiceDataSelect name={"Platba"} type={"payment"} items={this.state.formData.payments} value={this.state["payment"]} onValueChange={this.handleChange}/>
+                            <InvoiceDataSelect name={"Doprava"} type={"shipping"} items={this.state.formData.shipping} value={this.state["shipping"]} onValueChange={this.handleChange}/>
+                        </div>
+                        <div className={"select-group"}>
+                            <DateSelect name={"Datum vystavení"} type={"vystaveni"} onValueChange={this.handleChange}/>
+                            <DateSelect name={"Datum zdanitelné plnění"} type={"plneni"} onValueChange={this.handleChange}/>
+                            <DateSelect name={"Datum splatnost"} type={"splatnost"} onValueChange={this.handleChange}/>
+                        </div>
+                        <UserSelect name={"Vybrat uživatele"} selectedUser={this.addUser}/>
+                        <ProductSelect name={"Přidat produkty"} selectedProduct={this.addProduct}/>
+                        <ProductsTable products={this.state.products} updateProduct={this.productChange} removeProduct={this.removeProduct}/>
                     </div>
-                    <div className={"select-group"}>
-                        <DateSelect name={"Datum vystavení"} type={"vystaveni"} onValueChange={this.handleChange}/>
-                        <DateSelect name={"Datum zdanitelné plnění"} type={"plneni"} onValueChange={this.handleChange}/>
-                        <DateSelect name={"Datum splatnost"} type={"splatnost"} onValueChange={this.handleChange}/>
+                    <div>
+                        <InvoicePage
+                            name={this.state.invoiceType}
+                            platba={this.state.payment}
+                            doprava={this.state.shipping}
+                            number={this.state.formData.number}
+                            eshopInfo={this.state.formData.eshopInfo}
+                            userInfo={this.state.userInfo}
+                            vystaveni={this.state.vystaveni}
+                            plneni={this.state.plneni}
+                            splatnost={this.state.splatnost}
+                            products={this.state.products}
+                        />
                     </div>
-                    <UserSelect name={"Vybrat uživatele"} selectedUser={this.addUser}/>
-                    <ProductSelect name={"Přidat produkty"} selectedProduct={this.addProduct}/>
-                    <ProductsTable products={this.state.products} updateProduct={this.productChange}/>
-                    <InvoicePage
-                        name={this.state.invoiceType}
-                        number={this.state.formData.number}
-                        eshopInfo={this.state.formData.eshopInfo}
-                        userInfo={this.state.userInfo}
-                        vystaveni={this.state.vystaveni}
-                        plneni={this.state.plneni}
-                        splatnost={this.state.splatnost}
-                        products={this.state.products}
-                    />
                 </div>
             )
         } else {
@@ -164,7 +177,6 @@ class InvoicePage extends React.Component {
 
     render() {
         const {name, number, eshopInfo, userInfo, vystaveni, plneni, splatnost} = this.props;
-
         return (
             <div id={"invoice-container"}>
                 <div className={"invoice-header"}>
@@ -201,7 +213,7 @@ class InvoicePage extends React.Component {
                         <p>Datum splatnosti: {standardDateFormat(splatnost)}</p>
                     </div>
                 </div>
-
+                <ProductsInvoiceTable products={this.props.products} platba={this.props.platba} doprava={this.props.doprava}/>
             </div>
         )
     }
@@ -328,7 +340,6 @@ class ProductSelect extends React.Component {
         this.setState({value: e.target.value})
         if (e.target.value !== "") {
             const response = await fetch("objednavky/faktury/hledatProdukty/" + e.target.value);
-            console.log(response)
             const results = await response.json();
             this.setState({results: results});
         } else {
@@ -371,7 +382,6 @@ class SearchResults extends React.Component {
                 <div></div>
             )
         } else {
-            console.log(items);
             return (
                 <div className={"search-results"}>
                     {items.map(item => (
@@ -392,6 +402,7 @@ class ProductsTable extends React.Component {
     constructor(props) {
         super(props);
         this.onChange = this.onChange.bind(this);
+        this.removeProduct = this.removeProduct.bind(this);
     }
 
     updateProduct(type, value, product) {
@@ -405,45 +416,100 @@ class ProductsTable extends React.Component {
         this.updateProduct(type, value, product)
     }
 
+    removeProduct(e) {
+        this.props.removeProduct(e.target.getAttribute("productname"))
+    }
+
     render() {
         const items = Object.values(this.props.products);
-        if (Object.keys(items).length === 0 && items.constructor === Object) {
-            return (
-                <div>
-                </div>
-            )
+        if (Object.keys(items).length === 0 && items.constructor === Array) {
+            return false;
         } else {
             return (
-                <table className={"table table-striped"}>
-                    <thead>
-                    <tr>
-                        <th>Název</th>
-                        <th>Počet</th>
-                        <th>Jednotková cena</th>
-                        <th>Celková cena</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {items.map(item => (
-                        <tr key={item.id}>
-                            <td>
-                                {item.name}
-                            </td>
-                            <td>
-                                <input type={"text"} className={"form-control"} value={item.count} itemType={"count"} productname={item.dashName} onChange={this.onChange}/>
-                            </td>
-                            <td>
-                                <input type={"text"} className={"form-control"} value={item.price} itemType={"price"} productname={item.dashName} onChange={this.onChange}/>
-                            </td>
-                            <td>
-                                {item.price * item.count}
-                            </td>
+                <React.Fragment>
+                    <table className={"table table-striped"}>
+                        <thead>
+                        <tr>
+                            <th colSpan={2}>Název</th>
+                            <th>Počet</th>
+                            <th>Jednotková cena</th>
+                            <th>Celková cena</th>
                         </tr>
-                    ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {items.map(item => (
+                            <tr key={item.id}>
+                                <td>
+                                    <button className={"btn btn-danger"} onClick={this.removeProduct} productname={item.dashName}>Odebrat</button>
+                                </td>
+                                <td>
+                                    {item.name}
+                                </td>
+                                <td>
+                                    <input type={"text"} className={"form-control"} value={item.count} itemType={"count"} productname={item.dashName} onChange={this.onChange}/>
+                                </td>
+                                <td>
+                                    <input type={"text"} className={"form-control"} value={item.price} itemType={"price"} productname={item.dashName} onChange={this.onChange}/>
+                                </td>
+                                <td>
+                                    {item.price * item.count}
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </React.Fragment>
             )
 
+        }
+    }
+}
+
+class ProductsInvoiceTable extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        let propProducts = Object.values(this.props.products);
+        console.log(this.props.doprava === "");
+        console.log(this.props.platba === "");
+        const products = Object.values(this.props.products);
+        if (Object.keys(products).length === 0) {
+            return false;
+        } else {
+            return (
+                <div className={"produts"}>
+                    <table className="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Produkt</th>
+                            <th>Počet ks</th>
+                            <th>Cena za kus</th>
+                            <th>Cena celkem</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {products.map(item => (
+                            <tr key={item.id}>
+                                <td>
+                                    {item.name}
+                                </td>
+                                <td>
+                                    {item.count} ks
+                                </td>
+                                <td>
+                                    {item.price * 1} Kč
+                                </td>
+                                <td>
+                                    {item.price * item.count} Kč
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+            )
         }
     }
 }
