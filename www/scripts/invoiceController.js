@@ -472,9 +472,12 @@ class ProductsInvoiceTable extends React.Component {
 
     render() {
         let propProducts = Object.values(this.props.products);
-        console.log(this.props.doprava === "");
-        console.log(this.props.platba === "");
-        const products = Object.values(this.props.products);
+        console.log(this.props.doprava);
+        console.log(this.props.platba);
+        propProducts.doprava = {"name": this.props.doprava, "count": 1, "price": 0};
+        propProducts.platba = {"name": this.props.platba, "count": 1, "price": 0};
+        console.log(propProducts)
+        const products = propProducts;
         if (Object.keys(products).length === 0) {
             return false;
         } else {
@@ -499,7 +502,7 @@ class ProductsInvoiceTable extends React.Component {
                                     {item.count} ks
                                 </td>
                                 <td>
-                                    {item.price * 1} Kč
+                                    {item.price*1} Kč
                                 </td>
                                 <td>
                                     {item.price * item.count} Kč

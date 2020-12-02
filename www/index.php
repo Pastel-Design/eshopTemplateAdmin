@@ -16,7 +16,10 @@ require("../vendor/autoload.php");
  */
 function autoloadFunction($class)
 {
-    require("../" . preg_replace("/[\\ ]+/", "/", $class) . ".php");
+    $classname="../" . preg_replace("/[\\ ]+/", "/", $class) . ".php";
+    if (is_readable($classname)) {
+        require($classname);
+    }
 }
 
 
