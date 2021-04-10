@@ -70,7 +70,8 @@ class App extends React.Component {
     }
 
     async addProduct(product) {
-        const response = await fetch("objednavky/faktury/produkt/" + product);
+        let url = "objednavky/faktury/produkt/" + product;
+        const response = await fetch(url, {});
         let productInfo = await response.json()
         let stateProducts = this.state.products;
         if (product in stateProducts) {
@@ -82,91 +83,94 @@ class App extends React.Component {
         this.setState({products: stateProducts});
     }
 
-    productChange(type, value, product) {
-        let isNumber = function (str) {
-            let pattern = /^\d+$/;
-            return pattern.test(str);
+productChange(type, value, product)
+{
+    let isNumber = function (str) {
+        let pattern = /^\d+$/;
+        return pattern.test(str);
+    }
+    let isPriceNumber = function (str) {
+        let pattern = /^\d+(\.|,)?\d{0,2}$/;
+        return pattern.test(str);
+    }
+    if (type === "price") {
+        if (isPriceNumber(value)) {
+            value = value.replace(",", ".");
+            let stateProducts = this.state.products;
+            stateProducts[product][type] = value;
+            this.setState({products: stateProducts});
         }
-        let isPriceNumber = function (str) {
-            let pattern = /^\d+(\.|,)?\d{0,2}$/;
-            return pattern.test(str);
+        if (value === "") {
+            let stateProducts = this.state.products;
+            stateProducts[product][type] = value;
+            this.setState({products: stateProducts});
         }
-        if (type === "price") {
-            if (isPriceNumber(value)) {
-                value = value.replace(",", ".");
-                let stateProducts = this.state.products;
-                stateProducts[product][type] = value;
-                this.setState({products: stateProducts});
-            }
-            if (value === "") {
-                let stateProducts = this.state.products;
-                stateProducts[product][type] = value;
-                this.setState({products: stateProducts});
-            }
-        } else {
-            if (isNumber(value)) {
-                let stateProducts = this.state.products;
-                stateProducts[product][type] = value;
-                this.setState({products: stateProducts});
-            }
-            if (value === "") {
-                let stateProducts = this.state.products;
-                stateProducts[product][type] = value;
-                this.setState({products: stateProducts});
-            }
+    } else {
+        if (isNumber(value)) {
+            let stateProducts = this.state.products;
+            stateProducts[product][type] = value;
+            this.setState({products: stateProducts});
+        }
+        if (value === "") {
+            let stateProducts = this.state.products;
+            stateProducts[product][type] = value;
+            this.setState({products: stateProducts});
         }
     }
+}
 
-    removeProduct(product) {
-        let products = this.state.products;
-        delete products[product];
-        this.setState({products: products})
-    }
+removeProduct(product)
+{
+    let products = this.state.products;
+    delete products[product];
+    this.setState({products: products})
+}
 
-    render() {
-        let invoiceType = [{"name": "Faktura", "id": 1}, {"name": "Dobropis", "id": 2}]
+render()
+{
+    let invoiceType = [{"name": "Faktura", "id": 1}, {"name": "Dobropis", "id": 2}]
 
-        if (this.state.isLoaded) {
-            return (
-                <div className={"invoice-generator-container"}>
-                    <div>
-                        <h1>Nová faktura</h1>
-                        <div className={"select-group"}>
-                            <InvoiceDataSelect name={"Typ faktury"} type={"invoiceType"} items={invoiceType} value={this.state["invoiceType"]} onValueChange={this.handleChange}/>
-                            <InvoiceDataSelect name={"Platba"} type={"payment"} items={this.state.formData.payments} value={this.state["payment"]} onValueChange={this.handleChange}/>
-                            <InvoiceDataSelect name={"Doprava"} type={"shipping"} items={this.state.formData.shipping} value={this.state["shipping"]} onValueChange={this.handleChange}/>
-                        </div>
-                        <div className={"select-group"}>
-                            <DateSelect name={"Datum vystavení"} type={"vystaveni"} onValueChange={this.handleChange}/>
-                            <DateSelect name={"Datum zdanitelné plnění"} type={"plneni"} onValueChange={this.handleChange}/>
-                            <DateSelect name={"Datum splatnost"} type={"splatnost"} onValueChange={this.handleChange}/>
-                        </div>
-                        <UserSelect name={"Vybrat uživatele"} selectedUser={this.addUser}/>
-                        <ProductSelect name={"Přidat produkty"} selectedProduct={this.addProduct}/>
-                        <ProductsTable products={this.state.products} updateProduct={this.productChange} removeProduct={this.removeProduct}/>
+    if (this.state.isLoaded) {
+        return (
+            <div className={"invoice-generator-container"}>
+                <div>
+                    <h1>Nová faktura</h1>
+                    <div className={"select-group"}>
+                        <InvoiceDataSelect name={"Typ faktury"} type={"invoiceType"} items={invoiceType} value={this.state["invoiceType"]} onValueChange={this.handleChange}/>
+                        <InvoiceDataSelect name={"Platba"} type={"payment"} items={this.state.formData.payments} value={this.state["payment"]} onValueChange={this.handleChange}/>
+                        <InvoiceDataSelect name={"Doprava"} type={"shipping"} items={this.state.formData.shipping} value={this.state["shipping"]} onValueChange={this.handleChange}/>
                     </div>
-                    <div>
-                        <InvoicePage
-                            name={this.state.invoiceType}
-                            platba={this.state.payment}
-                            doprava={this.state.shipping}
-                            number={this.state.formData.number}
-                            eshopInfo={this.state.formData.eshopInfo}
-                            userInfo={this.state.userInfo}
-                            vystaveni={this.state.vystaveni}
-                            plneni={this.state.plneni}
-                            splatnost={this.state.splatnost}
-                            products={this.state.products}
-                        />
+                    <div className={"select-group"}>
+                        <DateSelect name={"Datum vystavení"} type={"vystaveni"} onValueChange={this.handleChange}/>
+                        <DateSelect name={"Datum zdanitelné plnění"} type={"plneni"} onValueChange={this.handleChange}/>
+                        <DateSelect name={"Datum splatnost"} type={"splatnost"} onValueChange={this.handleChange}/>
                     </div>
+                    <UserSelect name={"Vybrat uživatele"} selectedUser={this.addUser}/>
+                    <ProductSelect name={"Přidat produkty"} selectedProduct={this.addProduct}/>
+                    <ProductsTable products={this.state.products} updateProduct={this.productChange} removeProduct={this.removeProduct}/>
                 </div>
-            )
-        } else {
-            return (
-                <div>Loading...</div>
-            )
-        }
+                <div>
+                    <InvoicePage
+                        name={this.state.invoiceType}
+                        platba={this.state.payment}
+                        doprava={this.state.shipping}
+                        number={this.state.formData.number}
+                        eshopInfo={this.state.formData.eshopInfo}
+                        userInfo={this.state.userInfo}
+                        vystaveni={this.state.vystaveni}
+                        plneni={this.state.plneni}
+                        splatnost={this.state.splatnost}
+                        products={this.state.products}
+                    />
+                </div>
+            </div>
+        )
+    } else {
+        return (
+            <div>Loading...</div>
+        )
     }
+}
 }
 
 class InvoicePage extends React.Component {
@@ -472,11 +476,11 @@ class ProductsInvoiceTable extends React.Component {
 
     render() {
         let propProducts = Object.values(this.props.products);
-        console.log(this.props.doprava);
-        console.log(this.props.platba);
+        //console.log(this.props.doprava);
+        //console.log(this.props.platba);
         propProducts.doprava = {"name": this.props.doprava, "count": 1, "price": 0};
         propProducts.platba = {"name": this.props.platba, "count": 1, "price": 0};
-        console.log(propProducts)
+        //console.log(propProducts)
         const products = propProducts;
         if (Object.keys(products).length === 0) {
             return false;
@@ -502,7 +506,7 @@ class ProductsInvoiceTable extends React.Component {
                                     {item.count} ks
                                 </td>
                                 <td>
-                                    {item.price*1} Kč
+                                    {item.price * 1} Kč
                                 </td>
                                 <td>
                                     {item.price * item.count} Kč
